@@ -174,31 +174,120 @@
         </footer>
     </div>
 
-    <!-- 音乐控制 -->
-    <div class="fixed bottom-8 right-8 z-50">
-        <button id="musicBtn" 
-                onclick="toggleMusic()"
-                class="w-14 h-14 bg-white rounded-full shadow-xl flex items-center justify-center text-2xl hover:scale-110 transition-all">
-            🎵
-        </button>
-    </div>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>致最可爱的稣稣 🎉</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Playfair+Display:wght@700&display=swap');
+        
+        body { font-family: 'Noto Sans SC', system-ui, sans-serif; }
+        .title-font { font-family: 'Playfair Display', cursive; }
 
-    <audio id="birthdayMusic" loop>
-        <source src="https://assets.mixkit.co/sfx/preview/2967/2967.wav" type="audio/wav">
-        <!-- 可以换成你喜欢的生日歌链接 -->
-    </audio>
+        .hero-bg { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); }
+
+        .balloon { position: absolute; font-size: 3rem; animation: float 8s infinite ease-in-out; }
+        @keyframes float { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-80px) rotate(15deg); } }
+
+        .cake { animation: cake-bob 3s infinite ease-in-out; }
+        @keyframes cake-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        .sparkle { position: absolute; width: 6px; height: 6px; background: white; border-radius: 50%; box-shadow: 0 0 10px #fff; animation: sparkle-anim 1.5s infinite; }
+        @keyframes sparkle-anim { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
+
+        .modal { animation: modalPop 0.4s ease-out; }
+        @keyframes modalPop { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-100 via-purple-100 to-indigo-100 min-h-screen overflow-x-hidden">
+
+    <div id="canvas-container" class="fixed inset-0 pointer-events-none z-0"></div>
+
+    <div class="relative z-10 min-h-screen flex flex-col">
+        <nav class="bg-white/80 backdrop-blur-md border-b border-white/50 fixed w-full z-50">
+            <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-heart text-pink-500 text-2xl"></i>
+                    <span class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">Susu's Day</span>
+                </div>
+            </div>
+        </nav>
+
+        <section id="home" class="hero-bg min-h-screen flex items-center justify-center relative pt-20">
+            <div class="text-center px-6 max-w-4xl mx-auto">
+                <h1 class="title-font text-8xl md:text-[120px] leading-none font-bold text-white drop-shadow-2xl mb-6 tracking-tighter">
+                    生日快乐<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-pink-200 to-purple-200">宝贝稣稣</span>
+                </h1>
+                <p class="text-2xl md:text-3xl text-white/90 mb-12 font-light">愿你永远被温柔以待，被世界偏爱</p>
+                
+                <div class="cake mx-auto w-64 h-64 flex items-center justify-center text-9xl mb-10 drop-shadow-2xl">🎂</div>
+                
+                <button onclick="blowCandles()" class="group relative px-12 py-6 bg-white text-pink-600 rounded-2xl text-xl font-semibold hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl flex items-center gap-4 mx-auto">
+                    <i class="fa-solid fa-wind"></i>
+                    <span>吹灭蜡烛许愿</span>
+                    <span class="text-2xl">🕯️</span>
+                </button>
+            </div>
+        </section>
+
+        <section id="memories" class="py-24 bg-white">
+            <div class="max-w-6xl mx-auto px-6">
+                <h2 class="text-5xl font-bold text-center mb-16 text-gray-800">我们一起走过的闪光时刻</h2>
+                
+                <div onclick="showPhotoGallery()" 
+                     class="group bg-gradient-to-br from-pink-50 to-purple-50 p-8 rounded-3xl hover:scale-105 transition-all duration-500 cursor-pointer max-w-md mx-auto">
+                    <div class="text-6xl mb-6">📸</div>
+                    <h3 class="text-2xl font-semibold mb-3">快乐傻笑</h3>
+                    <p class="text-gray-600">你每次笑起来都像全世界最亮的星星～</p>
+                    <div class="mt-6 text-pink-500 text-sm font-medium flex items-center gap-2 justify-center">
+                        点击查看 12 张可爱照片 <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 照片模态框 -->
+        <div id="photoModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+            <div class="modal bg-white rounded-3xl max-w-5xl w-full mx-4 overflow-hidden">
+                <div class="flex justify-between items-center px-8 py-5 border-b">
+                    <h3 class="text-2xl font-semibold">快乐傻笑时刻 💖</h3>
+                    <button onclick="closeModal()" class="text-4xl text-gray-400 hover:text-gray-600">×</button>
+                </div>
+                
+                <div class="p-8">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="photoGrid"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="py-12 bg-gradient-to-t from-pink-950 to-transparent text-white/70 text-center">
+            <p>Made with ❤️ for 稣稣</p>
+            <p class="text-sm mt-2">生日快乐呀～永远开心！</p>
+        </footer>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script>
-        // Tailwind 配置
-        tailwind.config = {
-            content: [],
-            theme: {
-                extend: {}
-            }
-        }
+        const photos = [
+            "https://ibb.co/2YKXZzkN",
+            "https://ibb.co/QFKXwwY1",
+            "https://ibb.co/fVVCzwC2",
+            "https://ibb.co/n8R1SRR9",
+            "https://ibb.co/FkhCQ8cW",
+            "https://ibb.co/tw9CT711",
+            "https://ibb.co/1FVs9Nt",
+            "https://ibb.co/CDgIqCn",
+            "https://ibb.co/whXkpRRZ",
+            "https://ibb.co/cdBhx2Z",
+            "https://ibb.co/Wv7mWkZT",
+            "https://ibb.co/jvNx7FYz"
+        ];
 
-        // 粒子背景
         function createParticles() {
             const container = document.getElementById('canvas-container');
             for (let i = 0; i < 80; i++) {
@@ -211,67 +300,48 @@
             }
         }
 
-        // 吹蜡烛效果
         function blowCandles() {
-            confetti({
-                particleCount: 300,
-                spread: 90,
-                origin: { y: 0.6 },
-                colors: ['#ff69b4', '#ff1493', '#ffd700', '#ba55d3']
+            confetti({ particleCount: 300, spread: 90, origin: { y: 0.6 }, colors: ['#ff69b4', '#ffd700', '#ba55d3'] });
+            alert("🎉 许愿成功！愿宝贝稣稣的每一个愿望都实现～");
+        }
+
+        function showPhotoGallery() {
+            const grid = document.getElementById('photoGrid');
+            grid.innerHTML = '';
+            
+            photos.forEach(src => {
+                const div = document.createElement('div');
+                div.className = 'overflow-hidden rounded-2xl cursor-pointer hover:scale-105 transition-transform shadow-md';
+                div.innerHTML = `<img src="\( {src}" class="w-full h-full object-cover" onclick="enlargePhoto(' \){src}')">`;
+                grid.appendChild(div);
             });
             
-            setTimeout(() => {
-                confetti({
-                    particleCount: 200,
-                    angle: 60,
-                    spread: 70,
-                    origin: { x: 0.1 }
-                });
-            }, 300);
-            
-            alert("🎉 许愿成功！愿你所有的愿望都实现～");
+            document.getElementById('photoModal').classList.remove('hidden');
+            document.getElementById('photoModal').classList.add('flex');
         }
 
-        // 音乐控制
-        let isPlaying = false;
-        const audio = document.getElementById('birthdayMusic');
-        
-        function toggleMusic() {
-            const btn = document.getElementById('musicBtn');
-            if (isPlaying) {
-                audio.pause();
-                btn.innerHTML = '🎵';
-            } else {
-                audio.play();
-                btn.innerHTML = '⏸️';
-            }
-            isPlaying = !isPlaying;
+        function enlargePhoto(src) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/95 flex items-center justify-center z-[60]';
+            modal.innerHTML = `
+                <div class="relative max-w-4xl w-full mx-4">
+                    <button onclick="this.parentElement.parentElement.remove()" class="absolute -top-12 right-4 text-white text-5xl hover:text-pink-300">×</button>
+                    <img src="${src}" class="w-full rounded-3xl shadow-2xl">
+                </div>
+            `;
+            document.body.appendChild(modal);
         }
 
-        // 自动触发一次彩带
-        function launchInitialConfetti() {
-            setTimeout(() => {
-                confetti({
-                    particleCount: 150,
-                    spread: 70,
-                    origin: { y: 0.8 }
-                });
-            }, 800);
+        function closeModal() {
+            const modal = document.getElementById('photoModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
         }
 
-        // 初始化
         window.onload = function() {
             createParticles();
-            launchInitialConfetti();
-            
-            // 键盘彩蛋
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'c' || e.key === 'C') {
-                    confetti({
-                        particleCount: 400,
-                        spread: 120
-                    });
-                }
+                if (e.key.toLowerCase() === 'c') confetti({ particleCount: 400, spread: 120 });
             });
         };
     </script>
